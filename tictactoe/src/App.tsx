@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import './App.css';
+import Box from './components/Box';
 
-interface ISquares {
+export interface ISquares {
   id: number;
   value: string;
 }
@@ -106,12 +107,8 @@ function App() {
       <div className='container'>
         <h1>{infoText}</h1>
         <div className='boxContainer'>
-          {squares.map((square, index) => {
-            return (
-              <div className='box' key={index} onClick={() => handlePlayerTurn(square.id)}>
-                <p className=''>{square.value}</p>
-              </div>
-            );
+          {squares.map((square) => {
+            return <Box key={square.id} square={square} handlePlayerTurn={() => handlePlayerTurn} />;
           })}
         </div>
       </div>
