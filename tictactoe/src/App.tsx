@@ -104,9 +104,9 @@ function App() {
 
   return (
     <>
-      <div className='container'>
+      <div className="container">
         <h1>{infoText}</h1>
-        <div className='boxContainer'>
+        <div className="boxContainer">
           {squares.map((square) => {
             return <Box key={square.id} square={square} handlePlayerTurn={() => handlePlayerTurn} />;
           })}
