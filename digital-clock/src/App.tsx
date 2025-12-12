@@ -3,6 +3,7 @@ import './App.css';
 
 function App() {
   const [date, setDate] = useState<Date>(new Date());
+  
   const [timer, setTimer] = useState<number>(0);
   const [timerIsStarted, setTimerIsStarted] = useState<boolean>(false);
   const tick = useRef<number>(0);
