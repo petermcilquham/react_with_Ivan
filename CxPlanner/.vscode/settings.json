@@ -1,0 +1,14 @@
+{
+  // Use VS Code's default dark theme for syntax highlighting
+  "workbench.colorTheme": "Dark+ (default dark)",
+  
+  // Ensure semantic highlighting is enabled for better color accuracy
+  "editor.semanticHighlighting.enabled": true,
+  
+  // Use VS Code's default color customizations (optional - uncomment if you want to fine-tune)
+  // "editor.tokenColorCustomizations": {
+  //   "[Default Dark+]": {
+  //     "textMateRules": []
+  //   }
+  // }
+}

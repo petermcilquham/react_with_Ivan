@@ -50,16 +50,16 @@ export default function App2() {
   }
 
   return (
-    <div className=''>
+    <div className="">
       <h1>List of tasks:</h1>
-      <input placeholder='task here' value={taskInput} onChange={(e) => setTaskInput(e.currentTarget.value)} />
-      <button className='' onClick={addTask}>
+      <input placeholder="task here" value={taskInput} onChange={(e) => setTaskInput(e.currentTarget.value)} />
+      <button className="" onClick={addTask}>
         Add Task
       </button>
-      <div className='row'>
+      <div className="row">
         {taskList?.map((task, index) => (
           <div key={index}>
-            <input type='checkbox' checked={task.checked} onChange={() => checkTask(task.id)} />
+            <input type="checkbox" checked={task.checked} onChange={() => checkTask(task.id)} />
             {isEditing ? (
               <div>
                 <input placeholder={task.name} value={editTaskInput} onChange={(e) => setEditTaskInput(e.currentTarget.value)} />
@@ -69,10 +69,10 @@ export default function App2() {
             ) : (
               <div>
                 <p>{task.name}</p>
-                <button className='' onClick={() => setEditing(true)}>
+                <button className="" onClick={() => setEditing(true)}>
                   Edit Task
                 </button>
-                <button className='' onClick={() => deleteTask(task.id)}>
+                <button className="" onClick={() => deleteTask(task.id)}>
                   Delete Task
                 </button>
               </div>

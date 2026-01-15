@@ -1,0 +1,113 @@
+/*
+The below is a snippet of a legacy Javascript file for our download maanager/checker.
+As mentioned we are migrating all JS code to TS when we encounter it, and all
+new code must be TS.
+
+Below you'll find a JS fetch function, your task is to:
+- Create a download manager service in TypeScript that have methods for the below
+  fetch function, checker function, and finish function.
+- Include pseudo code for how to inform the user (UI).
+- Must be ES6. Must be a singleton. Must have interfaces.
+*/
+
+downloadRequestHash(projectID, '/api/file/generate/create', data);
+
+function downloadRequestHash(projectID, urlRequest, dataJson) {
+  let htmlContent1 = '<p style="font-size: 110%;"><b>' + langGen('ExportingInProgress') + '</b></p>';
+  let htmlContent2 =
+    '<div><div class="progress"> <div id="downloadProgress" class="progress-bar progress-bar-striped active" role="progressbar" style="width:5%"> </div> </div></div>';
+
+  var htmlContent = htmlContent1 + htmlContent2;
+
+  if (dataJson['emailme']) {
+    let emailLink =
+      '<div id="emailExportLink" style="margin-bottom: 20px; border: 1px solid var(--colorN60);padding: 8px;background-color: var(--colorN10);display: none;"><p>' +
+      langGen('ExportMail1') +
+      '</p><button id="emailExportLinkBtn" class="btn btn-base-secondary" onclick="taskExportEmailLink()">' +
+      langGen('ExportMail2') +
+      '</button></div>';
+
+    htmlContent = htmlContent1 + emailLink + htmlContent2;
+  }
+
+  let modal = window.$alertModal({
+    type: 'progressbar',
+    message: htmlContent,
+  });
+
+  fetch(urlRequest, {
+    method: 'POST',
+    headers: fetchHeaderCsrf,
+    body: new URLSearchParams(dataJson),
+  })
+    .then(manageErrors)
+    .then((response) => response.text())
+    .then((hash) => {
+      downloadCheckGenerate(projectID, hash, 10);
+    })
+    .catch((error) => {
+      onErrorSendPrivateEvent(error);
+    });
+}
+
+function downloadCheckGenerate(projectID, hash, progress) {
+  /**
+   * 0 => Worker has not started yet..
+   * 1 => Working
+   * 2 => File is ready
+   * 3 => Failed. See msg for details, could be a timeout.
+   * 4 => Unknown..
+   */
+  modal.exposed.setProgress(progress);
+  setTimeout(function () {
+    $.ajax({
+      type: 'GET',
+      url: '/api/file/creation/check/' + projectID + '/' + hash,
+    })
+      .done(function (response, textStatus, jqXHR) {
+        var j = JSON.parse(response);
+
+        if (j['status'] == '2') {
+          let downloadUrl = j['msg'];
+
+          window.$confirmModal({
+            type: 'info',
+            message: langGen('FileAvailable'),
+            okButtonText: langGen('Download'),
+            onOk: function () {
+              let downloadUrl = j['msg'];
+              let filename = j['filename'] != '' ? j['filename'] : j['projectname'].replaceAll(' ', '_') + j['fileext'];
+              openLinkInNewTab(downloadUrl, filename);
+            },
+          });
+        } else if (j['status'] == '1') {
+          if (progress == 100) {
+            downloadCheckGenerate(projectID, hash, 5);
+          } else {
+            downloadCheckGenerate(projectID, hash, progress + 5);
+          }
+
+          if (progress == 20) {
+            const emailExportLink = document.getElementById('emailExportLink');
+            if (emailExportLink) {
+              emailExportLink.style.display = 'block';
+              document.getElementById('emailExportLinkBtn').setAttribute('onclick', "taskExportEmailLink('" + projectID + "', '" + hash + "')");
+            }
+          }
+        } else {
+          window.$alertModal({
+            type: 'error',
+            message: j['msg'],
+          });
+        }
+      })
+      .fail(function (jqXHR, textStatus, errorThrown) {
+        if (jqXHR.status == 400 || jqXHR.status == 403) {
+          window.$alertModal({
+            type: 'error',
+            message: jqXHR.responseText,
+          });
+        }
+      });
+  }, 2500);
+}
